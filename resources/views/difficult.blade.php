@@ -10,7 +10,7 @@
     <div class="max-w-4xl mx-auto">
          <!-- Header -->
          <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold mb-4" style="color: #73EC8B">Math Quiz Challenge</h1>
+            <h1 class="text-4xl font-bold mb-4" style="color: #73EC8B">TangledDigits</h1>
             <div class="flex items-center justify-center gap-4">
                 <span class="px-4 py-2 rounded-full bg-gray-100">Difficult Level</span>
                 <div class="flex items-center gap-2">
