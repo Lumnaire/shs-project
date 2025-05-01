@@ -12,13 +12,13 @@
          <div class="text-center mb-12">
             <h1 class="text-4xl font-bold mb-4" style="color: #73EC8B">Math Quiz Challenge</h1>
             <div class="flex items-center justify-center gap-4">
-                <span class="px-4 py-2 rounded-full bg-gray-100">Easy Level</span>
+                <span class="px-4 py-2 rounded-full bg-gray-100">Difficult Level</span>
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-600">Question</span>
-                    <span class="font-bold" style="color: #ECE852" id="questionCounter">1/6</span>
+                    <span class="font-bold" style="color: #ECE852" id="questionCounter">1/3</span>
                 </div>
                 <div class="ml-4 text-sm text-gray-700 font-semibold">
-                    Remaining Clue: <span id="clueCount">1</span>
+                    Remaining Clue: <span id="clueCount">3</span>
                 </div>
             </div>
         </div>
@@ -78,23 +78,12 @@
             type: 'input',
             question: 'Find the mean of these scores: 8, 5, 7, 9, 6'
         },
-        {
-            type: 'input',
-            question: 'What is the mean of these configuration times (in minutes): 23, 25, 28, 27, 30, 32?'
-        },
-        {
-            type: 'input',
-            question: 'How many ways can 4 books be arranged on a shelf?'
-        },
-        {
-            type: 'input',
-            question: 'In how many ways can 3 students be chosen from a group of 5?'
-        }
+
     ];
 
     let clueUsed = false;
     let currentQuestion = 1;
-    const totalQuestions = 6;
+    const totalQuestions = 3;
     const questionsContainer = document.getElementById('questionsContainer');
 
     // Generate question cards
@@ -131,7 +120,7 @@
         document.querySelectorAll('.question-card').forEach((card, i) => {
             card.classList.toggle('hidden', i !== index - 1);
         });
-        document.getElementById('questionCounter').textContent = `${index}/6`;
+        document.getElementById('questionCounter').textContent = `${index}/3`;
         document.getElementById('progressBar').style.width = `${(index / totalQuestions) * 100}%`;
         document.getElementById('prevButton').disabled = index === 1;
         document.getElementById('nextButton').textContent = index === totalQuestions ? 'Finish Quiz' : 'Next Question';
@@ -176,17 +165,15 @@
         return true;
     }
 
-        document.getElementById('nextButton').addEventListener('click', () => {
+    document.getElementById('nextButton').addEventListener('click', () => {
         if (!validateAnswer()) return;
         if (currentQuestion < totalQuestions) {
             currentQuestion++;
             showQuestion(currentQuestion);
         } else {
-            // All questions completed — redirect to average level
-            window.location.href = "/average";
+            alert('Proceed assembling the wire!');
         }
-        });
-
+    });
 
     document.getElementById('prevButton').addEventListener('click', () => {
         if (currentQuestion > 1) {
@@ -195,21 +182,30 @@
         }
     });
 
-    // Clue buttons logic
-    document.querySelectorAll('.clue-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (clueUsed) return;
+    let remainingClues = 3;
 
-            const qNum = parseInt(btn.dataset.question);
-            const clueText = btn.nextElementSibling;
+document.querySelectorAll('.clue-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (remainingClues <= 0) return;
+
+        const qNum = parseInt(btn.dataset.question);
+        const clueText = btn.nextElementSibling;
+
+        // Only show clue if not already shown
+        if (clueText.classList.contains('hidden')) {
             clueText.textContent = clues[qNum];
             clueText.classList.remove('hidden');
+            remainingClues--;
+            document.getElementById('clueCount').textContent = remainingClues;
+        }
 
-            clueUsed = true;
-            document.getElementById('clueCount').textContent = '0';
+        // Disable all clue buttons if no clues left
+        if (remainingClues === 0) {
             document.querySelectorAll('.clue-btn').forEach(b => b.disabled = true);
-        });
+        }
     });
+});
+
 
     showQuestion(currentQuestion);
 </script>

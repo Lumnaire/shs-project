@@ -12,13 +12,13 @@
          <div class="text-center mb-12">
             <h1 class="text-4xl font-bold mb-4" style="color: #73EC8B">Math Quiz Challenge</h1>
             <div class="flex items-center justify-center gap-4">
-                <span class="px-4 py-2 rounded-full bg-gray-100">Easy Level</span>
+                <span class="px-4 py-2 rounded-full bg-gray-100">Average Level</span>
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-600">Question</span>
-                    <span class="font-bold" style="color: #ECE852" id="questionCounter">1/6</span>
+                    <span class="font-bold" style="color: #ECE852" id="questionCounter">1/5</span>
                 </div>
                 <div class="ml-4 text-sm text-gray-700 font-semibold">
-                    Remaining Clue: <span id="clueCount">1</span>
+                    Remaining Clue: <span id="clueCount">2</span>
                 </div>
             </div>
         </div>
@@ -42,59 +42,54 @@
 
 <script>
     const clues = {
-        1: "You’re picking 3 students from 5. Does the order you pick them matter?",
-        2: "Multiply how many shirts by how many pants. That gives all the outfit choices.",
-        3: "Add all the scores and divide by how many there are.",
-        4: "Add all the times together and divide by 6.",
-        5: "How many ways can you line up 4 books?",
-        6: "You’re just choosing, not putting in order."
+        1: "You can pick the same kind more than once. How many ways to pick 3 from 5 types?",
+        2: "Pick 3 digits from 0–9, but no repeats. Think: choices for 1st, 2nd, and 3rd digit.",
+        3: "Put the numbers in order. What’s in the middle?",
+        4: "How many ways to mix 5 letters if one repeats?",
+        5: "Order matters — one person per job!",
     };
 
     const correctAnswers = {
-        1: 'combination_5C3=10',
-        2: 12,
-        3: 7,
-        4: 27.5,
-        5: 24,
-        6: 10
+        1: 'combination_7C3=35',
+        2: 720,
+        3: 17.5,
+        4: 60,
+        5: 210
     };
 
     const questionData = [
         {
             type: 'mcq',
-            question: 'A school needs to select three students from a group of five to form a cleanup committee. The order they are chosen doesn\'t matter. How many different cleanup committees are possible? Is this a permutation or combination problem?',
+            question: 'A bakery offers five different types of cupcakes. You want to buy three cupcakes. How many different ways can you select three cupcakes if you can buy multiple cupcakes of the same type? Is this a permutation or combination problem?',
             options: [
-                { text: 'Combination problem, 5C3 = 10', value: 'combination_5C3=10' },
-                { text: 'Permutation problem, 5P3 = 60', value: 'permutation_5P3=60' },
-                { text: 'Combination problem, 5C2 = 10', value: 'combination_5C2=10' },
+                { text: 'Combination problem, 9C3 = 10', value: 'combination_9C3=10' },
+                { text: 'Permutation problem, 1P3 = 60', value: 'permutation_1P3=60' },
+                { text: 'Combination problem, 7C3 = 35', value: 'combination_7C3=35' }, //correct answer
                 { text: 'Permutation problem, 5P2 = 20', value: 'permutation_5P2=20' }
             ]
         },
         {
             type: 'input',
-            question: 'Maria has 4 different shirts and 3 different pants. How many different outfits can she make?'
+            question: 'A school locker requires a 3-digit combination where digits cannot repeat, and digits range from 0 to 9. How many different combinations are possible?'
         },
         {
             type: 'input',
-            question: 'Find the mean of these scores: 8, 5, 7, 9, 6'
+            question: 'A small company has 10 employees. Their monthly salaries (in thousands of pesos) are: 15, 18, 16, 15, 20, 25, 15, 18, 22, 17. Calculate the median of the employees\' monthly salaries.'
         },
         {
             type: 'input',
-            question: 'What is the mean of these configuration times (in minutes): 23, 25, 28, 27, 30, 32?'
+            question: 'From the word "APPLE", how many different arrangements can be made?'
         },
         {
             type: 'input',
-            question: 'How many ways can 4 books be arranged on a shelf?'
+            question: 'In how many ways can a president, a vice-president, and a secretary be chosen from 7 people, assuming one person can only hold one position?'
         },
-        {
-            type: 'input',
-            question: 'In how many ways can 3 students be chosen from a group of 5?'
-        }
+
     ];
 
     let clueUsed = false;
     let currentQuestion = 1;
-    const totalQuestions = 6;
+    const totalQuestions = 5;
     const questionsContainer = document.getElementById('questionsContainer');
 
     // Generate question cards
@@ -131,10 +126,10 @@
         document.querySelectorAll('.question-card').forEach((card, i) => {
             card.classList.toggle('hidden', i !== index - 1);
         });
-        document.getElementById('questionCounter').textContent = `${index}/6`;
+        document.getElementById('questionCounter').textContent = `${index}/5`;
         document.getElementById('progressBar').style.width = `${(index / totalQuestions) * 100}%`;
         document.getElementById('prevButton').disabled = index === 1;
-        document.getElementById('nextButton').textContent = index === totalQuestions ? 'Finish Quiz' : 'Next Question';
+        document.getElementById('nextButton').textContent = index === totalQuestions ? 'Proceed' : 'Next Question';
     }
 
     function validateAnswer() {
@@ -176,17 +171,16 @@
         return true;
     }
 
-        document.getElementById('nextButton').addEventListener('click', () => {
+    document.getElementById('nextButton').addEventListener('click', () => {
         if (!validateAnswer()) return;
         if (currentQuestion < totalQuestions) {
             currentQuestion++;
             showQuestion(currentQuestion);
         } else {
             // All questions completed — redirect to average level
-            window.location.href = "/average";
+            window.location.href = "/difficult";
         }
         });
-
 
     document.getElementById('prevButton').addEventListener('click', () => {
         if (currentQuestion > 1) {
@@ -195,21 +189,30 @@
         }
     });
 
-    // Clue buttons logic
-    document.querySelectorAll('.clue-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (clueUsed) return;
+    let remainingClues = 2;
 
-            const qNum = parseInt(btn.dataset.question);
-            const clueText = btn.nextElementSibling;
+document.querySelectorAll('.clue-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (remainingClues <= 0) return;
+
+        const qNum = parseInt(btn.dataset.question);
+        const clueText = btn.nextElementSibling;
+
+        // Only show clue if not already shown
+        if (clueText.classList.contains('hidden')) {
             clueText.textContent = clues[qNum];
             clueText.classList.remove('hidden');
+            remainingClues--;
+            document.getElementById('clueCount').textContent = remainingClues;
+        }
 
-            clueUsed = true;
-            document.getElementById('clueCount').textContent = '0';
+        // Disable all clue buttons if no clues left
+        if (remainingClues === 0) {
             document.querySelectorAll('.clue-btn').forEach(b => b.disabled = true);
-        });
+        }
     });
+});
+
 
     showQuestion(currentQuestion);
 </script>
