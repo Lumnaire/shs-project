@@ -149,7 +149,7 @@
         document.getElementById('questionCounter').textContent = `${index}/6`;
         document.getElementById('progressBar').style.width = `${(index / totalQuestions) * 100}%`;
         document.getElementById('prevButton').disabled = index === 1;
-        document.getElementById('nextButton').textContent = index === totalQuestions ? 'Finish Quiz' : 'Next Question';
+        document.getElementById('nextButton').textContent = index === totalQuestions ? 'Finish Quiz' : 'Check Answer';
     }
 
     function validateAnswer() {
@@ -191,24 +191,59 @@
         return true;
     }
 
-        document.getElementById('nextButton').addEventListener('click', () => {
+    let answerChecked = false;
+
+function showImageForQuestion(index) {
+    const card = document.querySelectorAll('.question-card')[index - 1];
+    if (card.querySelector('.circuit-image')) return;
+
+    const image = document.createElement('img');
+    image.src = `/color-${index}.png`;
+    image.alt = `Circuit Color ${index}`;
+    image.className = 'mt-4 circuit-image';
+
+    const label = document.createElement('p');
+    label.className = 'mt-4 font-semibold text-green-600';
+    label.textContent = `Here is your circuit color:`;
+
+    const clueBtn = card.querySelector('.clue-btn');
+    clueBtn.insertAdjacentElement('afterend', label);
+    label.insertAdjacentElement('afterend', image);
+}
+
+document.getElementById('nextButton').textContent = 'Check Answer';
+
+document.getElementById('nextButton').addEventListener('click', () => {
+    if (!answerChecked) {
         if (!validateAnswer()) return;
+
+        showImageForQuestion(currentQuestion);
+
+        answerChecked = true;
+
+        // Change button label
+        document.getElementById('nextButton').textContent =
+            currentQuestion === totalQuestions ? 'Proceed to Next Stage' : 'Proceed to Next Question';
+    } else {
         if (currentQuestion < totalQuestions) {
             currentQuestion++;
             showQuestion(currentQuestion);
+            document.getElementById('nextButton').textContent = 'Check Answer';
+            answerChecked = false;
         } else {
-            // All questions completed — redirect to average level
             window.location.href = "/average";
         }
-        });
+    }
+});
 
-
-    document.getElementById('prevButton').addEventListener('click', () => {
-        if (currentQuestion > 1) {
-            currentQuestion--;
-            showQuestion(currentQuestion);
-        }
-    });
+document.getElementById('prevButton').addEventListener('click', () => {
+    if (currentQuestion > 1) {
+        currentQuestion--;
+        showQuestion(currentQuestion);
+        answerChecked = false;
+        document.getElementById('nextButton').textContent = 'Check Answer';
+    }
+});
 
     // Clue buttons logic
     document.querySelectorAll('.clue-btn').forEach(btn => {
