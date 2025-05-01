@@ -129,7 +129,7 @@
         document.getElementById('questionCounter').textContent = `${index}/5`;
         document.getElementById('progressBar').style.width = `${(index / totalQuestions) * 100}%`;
         document.getElementById('prevButton').disabled = index === 1;
-        document.getElementById('nextButton').textContent = index === totalQuestions ? 'Proceed' : 'Next Question';
+        document.getElementById('nextButton').textContent = index === totalQuestions ? 'Proceed' : 'Check Answer';
     }
 
     function validateAnswer() {
@@ -171,23 +171,60 @@
         return true;
     }
 
-    document.getElementById('nextButton').addEventListener('click', () => {
+    let answerChecked = false;
+
+    function showImageForQuestion(index) {
+    const imageMap = {
+        1: 'color-7.png',
+        2: 'color-8.png',
+        3: 'color-3.png',
+        4: 'color-6.png',
+        5: 'color-1.png'
+    };
+
+    const card = document.querySelectorAll('.question-card')[index - 1];
+    if (card.querySelector('.circuit-image')) return; // Prevent duplicate
+
+    const image = document.createElement('img');
+    image.src = `/${imageMap[index]}`;
+    image.alt = `Circuit Color for Question ${index}`;
+    image.className = 'mt-4 circuit-image max-w-xs rounded shadow-md';
+
+    const label = document.createElement('p');
+    label.className = 'mt-4 font-semibold text-green-600';
+    label.textContent = `Here is your circuit color:`;
+
+    const clueBtn = card.querySelector('.clue-btn');
+    clueBtn.insertAdjacentElement('afterend', label);
+    label.insertAdjacentElement('afterend', image);
+}
+
+
+document.getElementById('nextButton').textContent = 'Check Answer';
+
+document.getElementById('nextButton').addEventListener('click', () => {
+    if (!answerChecked) {
         if (!validateAnswer()) return;
+
+        showImageForQuestion(currentQuestion);
+
+        answerChecked = true;
+
+        // Change button label
+        document.getElementById('nextButton').textContent =
+            currentQuestion === totalQuestions ? 'Proceed to Next Stage' : 'Proceed to Next Question';
+    } else {
         if (currentQuestion < totalQuestions) {
             currentQuestion++;
             showQuestion(currentQuestion);
+            document.getElementById('nextButton').textContent = 'Check Answer';
+            answerChecked = false;
         } else {
-            // All questions completed — redirect to average level
             window.location.href = "/difficult";
         }
-        });
+    }
+});
 
-    document.getElementById('prevButton').addEventListener('click', () => {
-        if (currentQuestion > 1) {
-            currentQuestion--;
-            showQuestion(currentQuestion);
-        }
-    });
 
     let remainingClues = 2;
 
