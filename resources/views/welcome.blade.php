@@ -40,6 +40,21 @@
     </div>
 </div>
 
+<!-- Flashscreen Overlay -->
+<div id="flashscreen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#ECE852] to-[#73EC8B] cursor-pointer">
+    <div class="text-center p-10 rounded-xl bg-white shadow-2xl max-w-lg w-full">
+        <h1 class="text-4xl font-bold mb-6 text-[#73EC8B]">TangledDigits</h1>
+        <div class="space-y-4 text-gray-700 text-left text-sm">
+            <p><strong>Step 1:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p><strong>Step 2:</strong> Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            <p><strong>Step 3:</strong> Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
+            <p><strong>Step 4:</strong> Duis aute irure dolor in reprehenderit in voluptate velit esse.</p>
+        </div>
+        <p class="mt-8 text-sm text-gray-500 italic">Click anywhere to continue</p>
+    </div>
+</div>
+
+
 <script>
     const clues = {
         1: "You’re picking 3 students from 5. Does the order you pick them matter?",
@@ -212,6 +227,11 @@
     });
 
     showQuestion(currentQuestion);
+
+     // Hide flashscreen on click
+     document.getElementById('flashscreen').addEventListener('click', function () {
+        this.classList.add('hidden');
+    });
 </script>
 </body>
 </html>
