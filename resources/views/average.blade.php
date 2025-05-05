@@ -132,44 +132,97 @@
         document.getElementById('nextButton').textContent = index === totalQuestions ? 'Proceed' : 'Check Answer';
     }
 
-    function validateAnswer() {
-        const card = document.querySelectorAll('.question-card')[currentQuestion - 1];
-        const error = card.querySelector('.error-message');
-        const clueBtn = card.querySelector('.clue-btn');
+    const correctMessages = [
+    "Naks naman!",
+    "Sana ol!",
+    "Kuya how to be u po?",
+    "Ka astig man uy!"
+];
 
-        if (questionData[currentQuestion - 1].type === 'mcq') {
-            const selected = card.querySelector('input[type="radio"]:checked');
-            if (!selected) {
-                error.textContent = "Please select an answer";
-                error.classList.remove('hidden');
-                return false;
-            }
-            if (selected.value !== correctAnswers[currentQuestion]) {
-                error.textContent = "Incorrect answer. Try again.";
-                error.classList.remove('hidden');
-                return false;
-            }
-        } else {
-            const input = card.querySelector('input[type="number"]');
-            if (!input.value.trim()) {
-                error.textContent = "Please enter an answer";
-                error.classList.remove('hidden');
-                input.style.borderColor = 'red';
-                return false;
-            }
-            const userAnswer = parseFloat(input.value);
-            if (userAnswer !== correctAnswers[currentQuestion]) {
-                error.textContent = "Incorrect answer. Try again.";
-                error.classList.remove('hidden');
-                input.style.borderColor = 'red';
-                return false;
-            }
-            input.style.borderColor = '#ECE852';
+const wrongMessages = [
+    "Try again, beshie!",
+    "Oops, not quite!",
+    "Halaka, mali!",
+    "Balik sa calculator or bumalik kana sakin!",
+    "Uy, di tama yan!",
+    "Ngek! Mali!",
+    "Wrong nanaman 😢",
+    "Almost but not quite!"
+];
+
+function showFeedback(card, isCorrect) {
+    // Prevent duplicates
+    if (card.querySelector('.feedback-img')) return;
+
+    const msg = isCorrect
+        ? correctMessages[Math.floor(Math.random() * correctMessages.length)]
+        : wrongMessages[Math.floor(Math.random() * wrongMessages.length)];
+
+    const imgNum = Math.floor(Math.random() * 8) + 1;
+    const imgPath = isCorrect ? `/correct-${imgNum}.jpg` : `/incorrect-${imgNum}.jpg`;
+
+    const msgLabel = document.createElement('p');
+    msgLabel.className = `mt-4 font-semibold ${isCorrect ? 'text-green-500' : 'text-red-500'}`;
+    msgLabel.textContent = msg;
+
+    const feedbackImg = document.createElement('img');
+    feedbackImg.src = imgPath;
+    feedbackImg.className = 'mt-2 w-48 feedback-img';
+    feedbackImg.alt = isCorrect ? 'Correct!' : 'Incorrect';
+
+    card.appendChild(msgLabel);
+    card.appendChild(feedbackImg);
+}
+
+
+function validateAnswer() {
+    const card = document.querySelectorAll('.question-card')[currentQuestion - 1];
+    const error = card.querySelector('.error-message');
+    const clueBtn = card.querySelector('.clue-btn');
+
+    // Remove old feedback if exists
+    const oldMsg = card.querySelector('.text-green-500, .text-red-500');
+    const oldImg = card.querySelector('.feedback-img');
+    if (oldMsg) oldMsg.remove();
+    if (oldImg) oldImg.remove();
+
+    if (questionData[currentQuestion - 1].type === 'mcq') {
+        const selected = card.querySelector('input[type="radio"]:checked');
+        if (!selected) {
+            error.textContent = "Please select an answer";
+            error.classList.remove('hidden');
+            return false;
         }
-
-        error.classList.add('hidden');
-        return true;
+        if (selected.value !== correctAnswers[currentQuestion]) {
+            error.textContent = "Incorrect answer. Try again.";
+            error.classList.remove('hidden');
+            showFeedback(card, false);
+            return false;
+        }
+    } else {
+        const input = card.querySelector('input[type="number"]');
+        if (!input.value.trim()) {
+            error.textContent = "Please enter an answer";
+            error.classList.remove('hidden');
+            input.style.borderColor = 'red';
+            return false;
+        }
+        const userAnswer = parseFloat(input.value);
+        if (userAnswer !== correctAnswers[currentQuestion]) {
+            error.textContent = "Incorrect answer. Try again.";
+            error.classList.remove('hidden');
+            input.style.borderColor = 'red';
+            showFeedback(card, false);
+            return false;
+        }
+        input.style.borderColor = '#ECE852';
     }
+
+    error.classList.add('hidden');
+    showFeedback(card, true);  // Show positive message and image
+    return true;
+}
+
 
     let answerChecked = false;
 
