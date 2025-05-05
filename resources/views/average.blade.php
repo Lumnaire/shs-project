@@ -158,7 +158,7 @@ function showFeedback(card, isCorrect) {
         ? correctMessages[Math.floor(Math.random() * correctMessages.length)]
         : wrongMessages[Math.floor(Math.random() * wrongMessages.length)];
 
-    const imgNum = Math.floor(Math.random() * 8) + 1;
+    const imgNum = Math.floor(Math.random() * 7) + 1;
     const imgPath = isCorrect ? `/correct-${imgNum}.jpg` : `/incorrect-${imgNum}.jpg`;
 
     const msgLabel = document.createElement('p');

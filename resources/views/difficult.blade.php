@@ -15,7 +15,7 @@
                 <span class="px-4 py-2 rounded-full bg-gray-100">Difficult Level</span>
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-600">Question</span>
-                    <span class="font-bold" style="color: #ECE852" id="questionCounter">1/3</span>
+                    <span class="font-bold" style="color: #ECE852" id="questionCounter">1/5</span>
                 </div>
                 <div class="ml-4 text-sm text-gray-700 font-semibold">
                     Remaining Clue: <span id="clueCount">3</span>
@@ -40,6 +40,20 @@
     </div>
 </div>
 
+<!-- Completion Modal -->
+<div id="completionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+      <h2 class="text-2xl font-bold mb-4 text-green-600">🎉 Congratulations!</h2>
+      <p class="mb-4 text-gray-700">Proceed assembling wires!</p>
+      <img src="/quiz-done.jpg" alt="Quiz Completed" class="mx-auto mb-6 w-48 h-48 object-cover">
+      <button id="confirmBtn" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+        Confirm
+      </button>
+    </div>
+  </div>
+
+
+
 <script>
     const clues = {
         1: "You pick 3 letters and 2 numbers. Order matters, and repeats are OK.",
@@ -52,51 +66,80 @@
     };
 
     const correctAnswers = {
-        1: { type: 'permutation', value: 1757600 },
-        2: 676000,
-        3: { mean: 3.95, median: 4, mode: 4 }
+    1: { type: 'permutation', value: 1757600 },
+    2: 676000,
+    3: 3.95, // mean
+    4: 4,    // median
+    5: 4     // mode
+};
 
-    };
+const frequencyTable = `
+<table class="table-auto w-full text-left border mt-4 mb-6">
+    <thead>
+        <tr class="bg-gray-100">
+            <th class="border px-4 py-2">Hours Studied</th>
+            <th class="border px-4 py-2">Number of Students</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td class="border px-4 py-2">2</td><td class="border px-4 py-2">3</td></tr>
+        <tr><td class="border px-4 py-2">3</td><td class="border px-4 py-2">5</td></tr>
+        <tr><td class="border px-4 py-2">4</td><td class="border px-4 py-2">6</td></tr>
+        <tr><td class="border px-4 py-2">5</td><td class="border px-4 py-2">4</td></tr>
+        <tr><td class="border px-4 py-2">6</td><td class="border px-4 py-2">2</td></tr>
+    </tbody>
+</table>`;
 
-    const questionData = [
-        {
-            type: 'hybrid',
-        question: 'A password must contain three letters and two numbers. How many different passwords are possible if repetition is allowed and the letters must be lowercase and the numbers 0-9? Is this a permutation or combination problem? ',
+
+const questionData = [
+    {
+        type: 'hybrid',
+        question: 'A password must contain three letters and two numbers. How many different passwords are possible if repetition is allowed and the letters must be lowercase and the numbers 0-9? Is this a permutation or combination problem?',
         options: [
             { text: 'Combination problem', value: 'combination' },
             { text: 'Permutation problem', value: 'permutation' }
         ]
-        },
-        {
-            type: 'input',
-            question: 'A license plate consists of 2 letters followed by 3 digits (e.g., AB-123). If letters and digits can be repeated, how many unique license plates are possible? '
-        },
-        {
-    type: 'frequency-analysis',
-    question: `The following frequency distribution table shows the number of hours 20 students spent studying for a major exam:<br><br>
-    <table class="table-auto w-full text-left border mt-4 mb-6">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="border px-4 py-2">Hours Studied</th>
-                <th class="border px-4 py-2">Number of Students</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td class="border px-4 py-2">2</td><td class="border px-4 py-2">3</td></tr>
-            <tr><td class="border px-4 py-2">3</td><td class="border px-4 py-2">5</td></tr>
-            <tr><td class="border px-4 py-2">4</td><td class="border px-4 py-2">6</td></tr>
-            <tr><td class="border px-4 py-2">5</td><td class="border px-4 py-2">4</td></tr>
-            <tr><td class="border px-4 py-2">6</td><td class="border px-4 py-2">2</td></tr>
-        </tbody>
-    </table>
-    Calculate the approximate <strong>mean</strong>, <strong>median class</strong>, and <strong>mode class</strong> of the hours studied.`
-}
+    },
+    {
+        type: 'input',
+        question: 'A license plate consists of 2 letters followed by 3 digits (e.g., AB-123). If letters and digits can be repeated, how many unique license plates are possible?'
+    },
+    {
+        type: 'input',
+        question: `Using the frequency table below, calculate the <strong>Approximate Mean</strong> of the hours studied: ${frequencyTable}`
+    },
+    {
+        type: 'input',
+        question: `Using the frequency table below, what is the <strong>Median Class</strong> of the hours studied? ${frequencyTable}`
+    },
+    {
+        type: 'input',
+        question: `Using the frequency table below, what is the <strong>Mode Class</strong> of the hours studied? ${frequencyTable}`
+    }
+];
 
-    ];
 
     let clueUsed = false;
     let currentQuestion = 1;
-    const totalQuestions = 3;
+    const totalQuestions = 5;
+    const correctMessages = [
+    "Naks naman!",
+    "Sana ol!",
+    "Kuya how to be u po?",
+    "Ka astig man uy!"
+];
+
+const wrongMessages = [
+    "Try again, beshie!",
+    "Oops, not quite!",
+    "Halaka, mali!",
+    "Balik sa calculator or bumalik kana sakin!",
+    "Uy, di tama yan!",
+    "Ngek! Mali!",
+    "Wrong nanaman 😢",
+    "Almost but not quite!"
+];
+
     const questionsContainer = document.getElementById('questionsContainer');
 
     // Generate question cards
@@ -143,60 +186,31 @@
         document.querySelectorAll('.question-card').forEach((card, i) => {
             card.classList.toggle('hidden', i !== index - 1);
         });
-        document.getElementById('questionCounter').textContent = `${index}/3`;
+        document.getElementById('questionCounter').textContent = `${index}/${totalQuestions}`;
         document.getElementById('progressBar').style.width = `${(index / totalQuestions) * 100}%`;
         document.getElementById('prevButton').disabled = index === 1;
-        document.getElementById('nextButton').textContent = index === totalQuestions ? 'Finish Quiz' : 'Next Question';
+        document.getElementById('nextButton').textContent = index === totalQuestions ? 'Finish Quiz' : 'Check Answer';
     }
 
     function validateAnswer() {
     const card = document.querySelectorAll('.question-card')[currentQuestion - 1];
     const error = card.querySelector('.error-message');
+    error.classList.add('hidden');
 
     const qType = questionData[currentQuestion - 1].type;
 
-    if (qType === 'mcq') {
-        const selected = card.querySelector('input[type="radio"]:checked');
-        if (!selected) {
-            error.textContent = "Please select an answer";
-            error.classList.remove('hidden');
-            return false;
-        }
-        if (selected.value !== correctAnswers[currentQuestion]) {
-            error.textContent = "Incorrect answer. Try again.";
-            error.classList.remove('hidden');
-            return false;
-        }
-
-    } else if (qType === 'input') {
-        const input = card.querySelector('input[type="number"]');
-        if (!input.value.trim()) {
-            error.textContent = "Please enter an answer";
-            error.classList.remove('hidden');
-            input.style.borderColor = 'red';
-            return false;
-        }
-        const userAnswer = parseFloat(input.value);
-        if (userAnswer !== correctAnswers[currentQuestion]) {
-            error.textContent = "Incorrect answer. Try again.";
-            error.classList.remove('hidden');
-            input.style.borderColor = 'red';
-            return false;
-        }
-        input.style.borderColor = '#ECE852';
-
-    } else if (qType === 'hybrid') {
+    // Question 1: hybrid (radio + input)
+    if (currentQuestion === 1) {
         const selected = card.querySelector('input[type="radio"]:checked');
         const input = card.querySelector('input[type="number"]');
-
         if (!selected || !input.value.trim()) {
             error.textContent = "Please answer both parts";
             error.classList.remove('hidden');
             return false;
         }
 
-        const radioCorrect = selected.value === correctAnswers[currentQuestion].type;
-        const inputCorrect = parseFloat(input.value) === correctAnswers[currentQuestion].value;
+        const radioCorrect = selected.value === correctAnswers[1].type;
+        const inputCorrect = parseInt(input.value) === correctAnswers[1].value;
 
         if (!radioCorrect || !inputCorrect) {
             error.textContent = "Incorrect answer. Try again.";
@@ -206,60 +220,246 @@
         }
 
         input.style.borderColor = '#ECE852';
-    } else if (qType === 'frequency-analysis') {
-    const meanInput = card.querySelector('.mean-input');
-    const medianInput = card.querySelector('.median-input');
-    const modeInput = card.querySelector('.mode-input');
-
-    if (!meanInput.value || !medianInput.value || !modeInput.value) {
-        error.textContent = "Please fill in all three fields";
-        error.classList.remove('hidden');
-        return false;
+        return true;
     }
 
-    const userMean = parseFloat(meanInput.value);
-    const userMedian = parseInt(medianInput.value);
-    const userMode = parseInt(modeInput.value);
+    // Question 2: standard input
+    if (currentQuestion === 2) {
+        const input = card.querySelector('input[type="number"]');
+        if (!input.value.trim()) {
+            error.textContent = "Please enter an answer";
+            error.classList.remove('hidden');
+            input.style.borderColor = 'red';
+            return false;
+        }
 
-    const { mean, median, mode } = correctAnswers[currentQuestion];
+        const userAnswer = parseInt(input.value);
+        if (userAnswer !== correctAnswers[2]) {
+            error.textContent = "Incorrect answer. Try again.";
+            error.classList.remove('hidden');
+            input.style.borderColor = 'red';
+            return false;
+        }
 
-    const meanCorrect = Math.abs(userMean - mean) < 0.05; // allow margin
-    const medianCorrect = userMedian === median;
-    const modeCorrect = userMode === mode;
-
-    if (!meanCorrect || !medianCorrect || !modeCorrect) {
-        error.textContent = "Incorrect answer. Try again.";
-        error.classList.remove('hidden');
-        return false;
+        input.style.borderColor = '#ECE852';
+        return true;
     }
 
-    error.classList.add('hidden');
+    // Question 3: mean (allow small error)
+    if (currentQuestion === 3) {
+        const input = card.querySelector('input[type="number"]');
+        if (!input.value.trim()) {
+            error.textContent = "Please enter an answer";
+            error.classList.remove('hidden');
+            input.style.borderColor = 'red';
+            return false;
+        }
+
+        const userAnswer = parseFloat(input.value);
+        const correct = correctAnswers[3];
+        const isCorrect = Math.abs(userAnswer - correct) < 0.05;
+
+        if (!isCorrect) {
+            error.textContent = "Incorrect answer. Try again.";
+            error.classList.remove('hidden');
+            input.style.borderColor = 'red';
+            return false;
+        }
+
+        input.style.borderColor = '#ECE852';
+        return true;
+    }
+
+    // Question 4: median
+    if (currentQuestion === 4) {
+        const input = card.querySelector('input[type="number"]');
+        if (!input.value.trim()) {
+            error.textContent = "Please enter an answer";
+            error.classList.remove('hidden');
+            input.style.borderColor = 'red';
+            return false;
+        }
+
+        const userAnswer = parseInt(input.value);
+        if (userAnswer !== correctAnswers[4]) {
+            error.textContent = "Incorrect answer. Try again.";
+            error.classList.remove('hidden');
+            input.style.borderColor = 'red';
+            return false;
+        }
+
+        input.style.borderColor = '#ECE852';
+        return true;
+    }
+
+    // Question 5: mode
+    if (currentQuestion === 5) {
+        const input = card.querySelector('input[type="number"]');
+        if (!input.value.trim()) {
+            error.textContent = "Please enter an answer";
+            error.classList.remove('hidden');
+            input.style.borderColor = 'red';
+            return false;
+        }
+
+        const userAnswer = parseInt(input.value);
+        if (userAnswer !== correctAnswers[5]) {
+            error.textContent = "Incorrect answer. Try again.";
+            error.classList.remove('hidden');
+            input.style.borderColor = 'red';
+            return false;
+        }
+
+        input.style.borderColor = '#ECE852';
+        return true;
+    }
+
     return true;
 }
 
 
-    error.classList.add('hidden');
-    return true;
-}
 
 
-    document.getElementById('nextButton').addEventListener('click', () => {
-        if (!validateAnswer()) return;
-        if (currentQuestion < totalQuestions) {
-            currentQuestion++;
-            showQuestion(currentQuestion);
+let state = 'check'; // or 'next'
+
+document.getElementById('nextButton').addEventListener('click', () => {
+    const card = document.querySelectorAll('.question-card')[currentQuestion - 1];
+
+    if (state === 'check') {
+        const valid = validateAnswer();
+
+        const existingFeedback = card.querySelector('.feedback-message');
+        if (existingFeedback) existingFeedback.remove();
+
+        const existingSuccess = card.querySelector('.success-msg');
+        if (existingSuccess) existingSuccess.remove();
+
+        if (!valid) {
+            const wrongMsg = wrongMessages[Math.floor(Math.random() * wrongMessages.length)];
+            const imgNum = Math.floor(Math.random() * 8) + 1;
+
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback-message text-center mt-6';
+
+            const img = document.createElement('img');
+            img.src = `/incorrect-${imgNum}.jpg`;
+            img.className = "w-32 h-32 mx-auto";
+
+            const msg = document.createElement('p');
+            msg.className = 'text-red-600 font-semibold mt-2';
+            msg.textContent = wrongMsg;
+
+            feedback.appendChild(img);
+            feedback.appendChild(msg);
+            card.appendChild(feedback);
+            return;
+        }
+
+        // Show correct feedback
+        const feedback = document.createElement('div');
+        feedback.className = 'success-msg text-center mt-6';
+        const correctImgNum = Math.floor(Math.random() * 7) + 1;
+        const correctMsg = correctMessages[Math.floor(Math.random() * correctMessages.length)];
+
+        if (currentQuestion === 1) {
+            const title = document.createElement('p');
+            title.textContent = "Here is your color:";
+            title.className = "font-semibold text-lg mb-2";
+
+            const colorImg = document.createElement('img');
+            colorImg.src = "/color-4.png";
+            colorImg.alt = "Color Preview";
+            colorImg.className = "mx-auto w-40 h-40 mb-4";
+
+            const correctImg = document.createElement('img');
+            correctImg.src = `/correct-${correctImgNum}.jpg`;
+            correctImg.className = "mx-auto w-32 h-32";
+
+            const msg = document.createElement('p');
+            msg.textContent = correctMsg;
+            msg.className = "text-green-600 font-bold text-xl mt-2";
+
+            feedback.appendChild(title);
+            feedback.appendChild(colorImg);
+            feedback.appendChild(correctImg);
+            feedback.appendChild(msg);
+        } else if (currentQuestion === 2) {
+            const title = document.createElement('p');
+            title.textContent = "Here is your circuit color:";
+            title.className = "font-semibold text-lg mb-2";
+
+            const colorImg = document.createElement('img');
+            colorImg.src = "/color-5.png";
+            colorImg.alt = "Circuit Color Preview";
+            colorImg.className = "mx-auto w-40 h-40 mb-4";
+
+            const correctImg = document.createElement('img');
+            correctImg.src = `/correct-${correctImgNum}.jpg`;
+            correctImg.className = "mx-auto w-32 h-32";
+
+            const msg = document.createElement('p');
+            msg.textContent = correctMsg;
+            msg.className = "text-green-600 font-bold text-xl mt-2";
+
+            feedback.appendChild(title);
+            feedback.appendChild(colorImg);
+            feedback.appendChild(correctImg);
+            feedback.appendChild(msg);
         } else {
-            alert('Proceed assembling the wire!');
-              window.location.href = "/";
-        }
-    });
+    const imgMap = {
+        3: 'color-2.png', // mean
+        4: 'color-7.png', // median
+        5: 'color-8.png'  // mode
+    };
 
-    document.getElementById('prevButton').addEventListener('click', () => {
-        if (currentQuestion > 1) {
-            currentQuestion--;
-            showQuestion(currentQuestion);
+    const title = document.createElement('p');
+    title.textContent = "Here is your circuit color:";
+    title.className = "font-semibold text-lg mb-2";
+
+    const colorImg = document.createElement('img');
+    colorImg.src = `/${imgMap[currentQuestion]}`;
+    colorImg.alt = "Color Preview";
+    colorImg.className = "mx-auto w-40 h-40 mb-4";
+
+    const correctImg = document.createElement('img');
+    correctImg.src = `/correct-${correctImgNum}.jpg`;
+    correctImg.className = "mx-auto w-32 h-32";
+
+    const msg = document.createElement('p');
+    msg.textContent = correctMsg;
+    msg.className = "text-green-600 font-bold text-xl mt-2";
+
+    feedback.appendChild(title);
+    feedback.appendChild(colorImg);
+    feedback.appendChild(correctImg);
+    feedback.appendChild(msg);
+}
+
+
+        card.appendChild(feedback);
+
+        if (currentQuestion < totalQuestions) {
+            document.getElementById('nextButton').textContent = 'Next Question';
+            state = 'next';
+        } else {
+            document.getElementById('nextButton').textContent = 'Finish Quiz';
+            state = 'next';
         }
-    });
+
+    } else if (state === 'next') {
+        if (currentQuestion < totalQuestions) {
+    currentQuestion++;
+    showQuestion(currentQuestion);
+    document.getElementById('nextButton').textContent = 'Check Answer';
+    state = 'check';
+} else {
+    document.getElementById('completionModal').classList.remove('hidden');
+
+}
+
+    }
+});
+
 
     let remainingClues = 3;
 
@@ -287,6 +487,20 @@ document.querySelectorAll('.clue-btn').forEach(btn => {
 
 
     showQuestion(currentQuestion);
+
+    function showModal() {
+    document.getElementById('quizModal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('quizModal').classList.add('hidden');
+}
+
+document.getElementById('confirmBtn').addEventListener('click', () => {
+    window.location.href = "/";
+});
+
+
 </script>
 </body>
 </html>
