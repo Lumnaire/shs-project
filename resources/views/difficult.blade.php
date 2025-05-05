@@ -369,11 +369,11 @@ document.getElementById('nextButton').addEventListener('click', () => {
             const colorImg = document.createElement('img');
             colorImg.src = "/color-4.png";
             colorImg.alt = "Color Preview";
-            colorImg.className = "mx-auto w-40 h-40 mb-4";
+            colorImg.className = "mt-4 w-full max-w-xs mx-auto rounded shadow-md";
 
             const correctImg = document.createElement('img');
             correctImg.src = `/correct-${correctImgNum}.jpg`;
-            correctImg.className = "mx-auto w-32 h-32";
+            correctImg.className = "mt-2 w-full max-w-xs mx-auto ";
 
             const msg = document.createElement('p');
             msg.textContent = correctMsg;

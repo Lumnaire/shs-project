@@ -167,7 +167,8 @@ function showFeedback(card, isCorrect) {
 
     const feedbackImg = document.createElement('img');
     feedbackImg.src = imgPath;
-    feedbackImg.className = 'mt-2 w-48 feedback-img';
+    feedbackImg.className = 'mt-2 w-full max-w-xs mx-auto feedback-img';
+
     feedbackImg.alt = isCorrect ? 'Correct!' : 'Incorrect';
 
     card.appendChild(msgLabel);
@@ -241,7 +242,7 @@ function validateAnswer() {
     const image = document.createElement('img');
     image.src = `/${imageMap[index]}`;
     image.alt = `Circuit Color for Question ${index}`;
-    image.className = 'mt-4 circuit-image max-w-xs rounded shadow-md';
+    image.className = 'mt-4 circuit-image w-full max-w-xs mx-auto rounded shadow-md';
 
     const label = document.createElement('p');
     label.className = 'mt-4 font-semibold text-green-600';
